@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>ico/close.png</file>
+        <file>ico/connected.png</file>
+        <file>ico/disconnected.png</file>
+        <file>ico/logo.png</file>
+    </qresource>
+</RCC>
