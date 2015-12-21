@@ -1,5 +1,13 @@
 #include "threadmanager.h"
-
+#include "clientwindow.h"
+#include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickView>
+#include <QQmlEngine>
+#include <QtQml>
+#include <QtCore>
+#include <QtQuick/QtQuick>
+#include <QQmlComponent>
+#include <QtQml/qqml.h>
 
 ThreadManager::ThreadManager(QObject *parent) :
     QObject (parent),
@@ -11,6 +19,19 @@ ThreadManager::ThreadManager(QObject *parent) :
     loadSettings();
     createThreads();
     createClientDeclaration();
+
+
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    QQuickWindow* window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
+
+    window->show();
+    ClientWindow cw1;
+    cw1.createWindows(engine);
+    cw1.object1->setY(0);
+
+//    ClientWindow cw2;
+//    cw2.createWindows(engine);
+//    cw2.object1->setY(0);
 
 }
 ThreadManager::~ThreadManager()

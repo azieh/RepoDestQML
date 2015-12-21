@@ -6,8 +6,7 @@ ApplicationWindow {
     id: mainWindow
     visible: true
     title: qsTr("Raportowanie przestojów")
-    width: 380
-    height: 457
+
 
 
 }

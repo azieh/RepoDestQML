@@ -29,7 +29,7 @@ public:
     WorkArea* st10;
     WorkArea* st20;
     QSettings* settings;
-
+       QQmlApplicationEngine engine;
     QList<settingsStruct> settingsList;
 
     void createThreads();
