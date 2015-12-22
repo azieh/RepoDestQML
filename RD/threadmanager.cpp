@@ -25,13 +25,13 @@ ThreadManager::ThreadManager(QObject *parent) :
     QQuickWindow* window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
 
     window->show();
-    ClientWindow cw1;
-    cw1.createWindows(engine);
-    cw1.object1->setY(0);
+//    ClientWindow cw1;
+//    cw1.createWindows(engine);
+//    cw1.object1->setY(50);
 
 //    ClientWindow cw2;
 //    cw2.createWindows(engine);
-//    cw2.object1->setY(0);
+//   cw2.object1->setY(100);
 
 }
 ThreadManager::~ThreadManager()
@@ -118,6 +118,7 @@ void ThreadManager::loadSettings()
 
 
     settings = new QSettings( QApplication::applicationDirPath() + "/settings.ini", QSettings::IniFormat );
+    qDebug() << settings->status();
 
 
     _apuDbPath = settings->value( "APU_database/path" ).toString();
