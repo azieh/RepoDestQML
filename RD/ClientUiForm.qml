@@ -2,7 +2,7 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
-
+import QtQuick.Controls.Styles 1.4
 
 
 GridLayout {
@@ -18,8 +18,8 @@ GridLayout {
         NumberAnimation { properties: "x,y"; easing.type: Easing.InOutQuad }
     }
 
-    property bool textAreaStateVisible: false
-    property bool leftBarGridStateVisible: false
+    property bool textAreaStateVisible: true
+    property bool leftBarGridStateVisible: true
 
     GridLayout {
         id: leftMainBarGrid
@@ -37,7 +37,9 @@ GridLayout {
             Layout.row: 0
             width: 50
             height: 50
-            color: "#b43535"
+            color: "#828282"
+            border.color: "#ffffff"
+            border.width: 1
 
             MouseArea {
                 id: mouseArea
@@ -69,75 +71,85 @@ GridLayout {
                 id: leftBarStatusRect
                 width: 50
                 height: 50
-                color: "#dcb1b1"
+                color: "#505050"
+                border.color: "#ffffff"
+                border.width: 1
             }
 
             Rectangle {
                 id: leftBarTimeRect
                 width: 50
                 height: 50
-                color: "#330303"
+                color: "#505050"
+                border.color: "#ffffff"
+                border.width: 1
             }
 
             Rectangle {
                 id: leftBarOkRect
                 width: 50
                 height: 50
-                color: "#6677a2"
+                color: "#505050"
+                radius: 1
+                border.color: "#ffffff"
+                border.width: 1
             }
 
             Rectangle {
                 id: leftBarNokRect
                 width: 50
                 height: 50
-                color: "#8bbc23"
+                color: "#505050"
+                radius: 0
+                border.color: "#ffffff"
+                rotation: 0
+                border.width: 1
             }
         }
 
     }
-    Rectangle{
-        id: textAreaRect
+
+
+
+
+
+
+    TextArea {
+        id: textArea
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-        Layout.maximumWidth: 200
-        color: "black"
-        height: 250
-        width: 200
+        Layout.fillHeight: true
+        Layout.fillWidth: true
         Layout.column: 2
         Layout.row: 0
 
 
+        font { pointSize: 6; family: "Tahoma" }
+
+        style: TextAreaStyle {
+            backgroundColor : "#505050"
+            textColor: "#ffffff"
+            renderType: Text.NativeRendering
+
+        }
+
+        text: "elo Panie/Panowie...\n\nCzy mógłby ktoś odesłać mnie do jakiejś lektury bądź przedstawić w jaki sposób wprowadzić adres IP i go wyświetlić? Mianowicie chodzi mi o coś takiego\n\nwprowadzam ip w formacie 192.168.1.1 i w takim samym mi wyświetla zapisując go pod zmienną którą dajmy na to nazwiemy IP by móc później operować tym adresem w celu np zmiany na adres binarny"
+        readOnly: true
 
         states: [
             State { when: textAreaStateVisible;
                 PropertyChanges {   target: textArea; opacity: 1.0; visible: true   }
-                PropertyChanges {   target: textAreaRect; opacity: 1.0; visible: true   }
             },
             State { when: !textAreaStateVisible;
                 PropertyChanges {   target: textArea; opacity: 0.0; visible: false  }
-                PropertyChanges {   target: textAreaRect; opacity: 1.0; visible: false   }
             }
         ]
         transitions: Transition {
             NumberAnimation { property: "opacity"; duration: 300 }
         }
 
-        TextArea {
-            id: textArea
-
-            anchors.fill: parent
-            textColor: "#ffffff"
-            font { pointSize: 6; family: "Tahoma" }
-
-
-            backgroundVisible: false
-
-
-
-            text: "elo Panie/Panowie...\n\nCzy mógłby ktoś odesłać mnie do jakiejś lektury bądź przedstawić w jaki sposób wprowadzić adres IP i go wyświetlić? Mianowicie chodzi mi o coś takiego\n\nwprowadzam ip w formacie 192.168.1.1 i w takim samym mi wyświetla zapisując go pod zmienną którą dajmy na to nazwiemy IP by móc później operować tym adresem w celu np zmiany na adres binarny"
-
-        }
-
     }
+
 }
+
 
 
