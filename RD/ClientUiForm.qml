@@ -3,6 +3,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
+import QtGraphicalEffects 1.0
 
 
 GridLayout {
@@ -29,18 +30,34 @@ GridLayout {
         Layout.maximumWidth: 50
         rowSpacing: 0
 
-
-        Rectangle {
-            id: leftBarNameRect
+        Item{
+            id: leftBarName
+            width: 50
+            height: 50
             Layout.alignment: Qt.AlignTop
             Layout.column: 1
             Layout.row: 0
-            width: 50
-            height: 50
-            color: "#828282"
-            border.color: "#ffffff"
-            border.width: 1
+            Rectangle {
+                id: leftBarNameRect
+                anchors.fill: parent
+                color: "#828282"
+                border.width: 0
 
+
+            }
+            InnerShadow {
+                color: "#505050"
+                anchors.fill: parent
+                cached: true
+                horizontalOffset: 0
+                verticalOffset: 0
+                radius: 32
+                fast: true
+                spread: 0.5
+                samples: 32
+                smooth: true
+                source: parent
+            }
             MouseArea {
                 id: mouseArea
                 anchors.fill: parent
@@ -127,6 +144,7 @@ GridLayout {
 
         style: TextAreaStyle {
             backgroundColor : "#505050"
+
             textColor: "#ffffff"
             renderType: Text.NativeRendering
 
