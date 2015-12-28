@@ -18,6 +18,24 @@ GridLayout {
     transitions: Transition {
         NumberAnimation { properties: "x,y"; easing.type: Easing.InOutQuad }
     }
+    Connections{
+        target: clientWindow
+        onLoopTimeUpdate:{
+            timeText.text = text
+        }
+        onOkUpdate:{
+            okText.text = text
+        }
+        onNokUpdate:{
+            nokText.text = text
+        }
+        onTextUpdate:{
+            textArea.append(text)
+        }
+        onStationNameUpdate:{
+            nameText.text = text
+        }
+    }
 
     property bool textAreaStateVisible: true
     property bool leftBarGridStateVisible: true
@@ -40,26 +58,35 @@ GridLayout {
             Rectangle {
                 id: leftBarNameRect
                 anchors.fill: parent
-                color: "#828282"
-                border.width: 0
-
-
+                color: "#747474"
+                border.color: "#292929"
+                border.width: 1
             }
             InnerShadow {
                 color: "#505050"
-                anchors.fill: parent
+                anchors.fill: leftBarNameRect
+                horizontalOffset: 4.3
+                verticalOffset: 4.1
+                radius: 9.9
                 cached: true
-                horizontalOffset: 0
-                verticalOffset: 0
-                radius: 32
+                spread: 0.7
                 fast: true
-                spread: 0.5
-                samples: 32
-                smooth: true
-                source: parent
+                samples: 8
+                source: leftBarNameRect
+            }
+            Text{
+                id:nameText
+                rotation: 45
+                font.family: "Arial"
+                font.bold: true
+                font.pointSize: 14
+                color: "#ffffff"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
             }
             MouseArea {
                 id: mouseArea
+                hoverEnabled: false
                 anchors.fill: parent
                 onClicked: {
                     textAreaStateVisible = !textAreaStateVisible
@@ -82,55 +109,107 @@ GridLayout {
             ]
             transitions: Transition {
                 NumberAnimation { property: "opacity"; duration: 200 }
-
             }
+
             Rectangle {
                 id: leftBarStatusRect
                 width: 50
                 height: 50
-                color: "#505050"
-                border.color: "#ffffff"
+                color: "#747474"
+                border.color: "#292929"
                 border.width: 1
+                ColumnLayout{
+                    anchors.fill: parent
+                    Layout.alignment: Qt.AlignCenter
+                    Text{
+                        color: "#ffffff"
+                        text: "Status"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.topMargin: 1
+                    }
+                    Text{
+                        id:statusText
+                        color: "#ffffff"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
             }
 
             Rectangle {
                 id: leftBarTimeRect
                 width: 50
                 height: 50
-                color: "#505050"
-                border.color: "#ffffff"
+                color: "#747474"
+                border.color: "#292929"
                 border.width: 1
+                ColumnLayout{
+                    anchors.fill: parent
+                    Layout.alignment: Qt.AlignCenter
+                    Text{
+                        color: "#ffffff"
+                        text: "1L time"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.topMargin: 1
+                    }
+                    Text{
+                        id:timeText
+                        color: "#ffffff"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
             }
 
             Rectangle {
                 id: leftBarOkRect
                 width: 50
                 height: 50
-                color: "#505050"
-                radius: 1
-                border.color: "#ffffff"
+                color: "#747474"
+                border.color: "#292929"
                 border.width: 1
+                ColumnLayout{
+                    anchors.fill: parent
+                    Layout.alignment: Qt.AlignCenter
+                    Text{
+                        color: "#ffffff"
+                        text: "OK:"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.topMargin: 1
+                    }
+                    Text{
+                        id:okText
+                        text: "0"
+                        color: "#ffffff"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
             }
 
             Rectangle {
                 id: leftBarNokRect
                 width: 50
                 height: 50
-                color: "#505050"
-                radius: 0
-                border.color: "#ffffff"
-                rotation: 0
+                color: "#747474"
+                border.color: "#292929"
                 border.width: 1
+                ColumnLayout{
+                    anchors.fill: parent
+                    Layout.alignment: Qt.AlignCenter
+                    Text{
+                        color: "#ffffff"
+                        text: "NOK"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.topMargin: 1
+                    }
+                    Text{
+                        id:nokText
+                        color: "#ffffff"
+                        text: "0"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
             }
         }
-
     }
-
-
-
-
-
-
     TextArea {
         id: textArea
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
@@ -139,19 +218,18 @@ GridLayout {
         Layout.column: 2
         Layout.row: 0
 
-
-        font { pointSize: 6; family: "Tahoma" }
-
+        readOnly: true
+        frameVisible: false
+        antialiasing: false
+        rotation: 0
+        textColor: "#ffffff"
+        font { pointSize: 7; family: "Tahoma" }
         style: TextAreaStyle {
-            backgroundColor : "#505050"
-
+            backgroundColor : "#292929"
             textColor: "#ffffff"
             renderType: Text.NativeRendering
 
         }
-
-        text: "elo Panie/Panowie...\n\nCzy mógłby ktoś odesłać mnie do jakiejś lektury bądź przedstawić w jaki sposób wprowadzić adres IP i go wyświetlić? Mianowicie chodzi mi o coś takiego\n\nwprowadzam ip w formacie 192.168.1.1 i w takim samym mi wyświetla zapisując go pod zmienną którą dajmy na to nazwiemy IP by móc później operować tym adresem w celu np zmiany na adres binarny"
-        readOnly: true
 
         states: [
             State { when: textAreaStateVisible;
@@ -164,10 +242,7 @@ GridLayout {
         transitions: Transition {
             NumberAnimation { property: "opacity"; duration: 300 }
         }
-
     }
-
 }
-
 
 

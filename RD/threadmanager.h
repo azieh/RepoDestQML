@@ -7,7 +7,7 @@
 #include <QQmlContext>
 #include <QQuickView>
 #include <QQmlEngine>
-
+#include "clientwindow.h"
 #include "workarea.h"
 #include "sqlhandler.h"
 
@@ -15,6 +15,12 @@ struct settingsStruct {
     QByteArray ipAddress;
     int dbNumber;
     QByteArray stationName;
+};
+
+struct clientStruct {
+    WorkArea* client;
+    QThread* thread;
+    ClientWindow* clientWindow;
 };
 
 
@@ -25,17 +31,17 @@ public:
     explicit ThreadManager(QObject *parent = 0);
     ~ThreadManager();
     SqlHandler* sqlH;
-    QThread* thread1;
-    WorkArea* st10;
-    WorkArea* st20;
     QSettings* settings;
-       QQmlApplicationEngine engine;
+    QQmlApplicationEngine engine;
     QList<settingsStruct> settingsList;
+    QList<clientStruct> clientList;
+
 
     void createThreads();
     void createClientDeclaration();
     void loadSettings();
- QQuickItem *object1;
+    void createViewEngine();
+
 
 
 private:

@@ -1,5 +1,4 @@
 #include "threadmanager.h"
-#include "clientwindow.h"
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickView>
 #include <QQmlEngine>
@@ -12,27 +11,12 @@
 ThreadManager::ThreadManager(QObject *parent) :
     QObject (parent),
     sqlH    (nullptr),
-    thread1 (nullptr),
-    st10    (nullptr),
     settings(nullptr)
 {
     loadSettings();
     createThreads();
+    createViewEngine();
     createClientDeclaration();
-
-
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    QQuickWindow* window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
-
-    window->show();
-//    ClientWindow cw1;
-//    cw1.createWindows(engine);
-//    cw1.object1->setY(50);
-
-//    ClientWindow cw2;
-//    cw2.createWindows(engine);
-//   cw2.object1->setY(100);
-
 }
 ThreadManager::~ThreadManager()
 {
@@ -40,13 +24,10 @@ ThreadManager::~ThreadManager()
     sqlH = nullptr;
 
     //Quit and clear every thread
-    thread1->quit();
-    delete thread1;
-    thread1 = nullptr;
+
 
     //Clear memory about every station instance
-    delete st10;
-    st10 = nullptr;
+
 
 }
 //------------------------------------------------------------------------------
@@ -63,12 +44,7 @@ void ThreadManager::createThreads()
     sqlH->setPcsDatabasePath( _pcsDbPath, _pcsDbName );
 
     //first generete thread instance
-    if ( thread1 != nullptr){
-        thread1->quit();
-        delete thread1;
-        thread1 = nullptr;
-    }
-    thread1 = new QThread;
+
 
 }
 //------------------------------------------------------------------------------
@@ -78,24 +54,35 @@ void ThreadManager::createClientDeclaration()
 {
     //genereting WorkArea class instance for each station on production line
 
-    if ( st10 != nullptr){
-        delete st10;
-        st10 = nullptr;
+    for (int i = 0; i < settingsList.size(); ++i){
+        clientStruct singleClientStruct;
+        singleClientStruct.client = new WorkArea(sqlH);
+        singleClientStruct.thread = new QThread;
+        singleClientStruct.clientWindow = new ClientWindow();
+        clientList.append( singleClientStruct );
     }
-    st10 = new WorkArea(sqlH);
-    st10->doSetup       ( thread1 );  // declarate thread for program
-    st10->moveToThread  ( thread1 ); // declarate thread for program
-    st10->setIpAddress  ( settingsList[0].ipAddress.data() );
-    st10->setDbNumber   ( settingsList[0].dbNumber );
-    st10->setName       ( settingsList[0].stationName.data() );
+    for (int i = 0; i < clientList.size(); ++i){
+        clientList[i].client -> doSetup( clientList[i].thread );
+        clientList[i].client -> moveToThread( clientList[i].thread );
+        clientList[i].client -> setIpAddress( settingsList[i].ipAddress.data() );
+        clientList[i].client -> setDbNumber( settingsList[i].dbNumber );
+        clientList[i].client -> setName ( settingsList[i].stationName.data() );
+
+        clientList[i].clientWindow->createWindows(engine);
+        clientList[i].clientWindow->onStationNameUpdate( settingsList[i].stationName.data() );
+
+        connect(clientList[i].client,SIGNAL(loopTime(const QString &)),clientList[i].clientWindow,SLOT(onLoopTimeUpdate(const QString &)));
+        connect(clientList[i].client,SIGNAL(messageText(const QString &)),clientList[i].clientWindow,SLOT(onTextUpdate(const QString &)));
+        connect(clientList[i].client,SIGNAL(messageOk(int)),clientList[i].clientWindow,SLOT(onOkUpdate(int)));
+        connect(clientList[i].client,SIGNAL(messageKo(int)),clientList[i].clientWindow,SLOT(onNokUpdate(int)));
+    }
 
 
-    st20 = new WorkArea(sqlH);
-    st20->doSetup       ( thread1 );  // declarate thread for program
-    st20->moveToThread  ( thread1 ); // declarate thread for program
-    st20->setIpAddress  ( settingsList[1].ipAddress.data() );
-    st20->setDbNumber   ( settingsList[1].dbNumber );
-    st20->setName       ( settingsList[1].stationName.data() );
+//    cw1 = new ClientWindow();
+//    cw1->createWindows(engine);
+
+//    connect(st10,SIGNAL(messageKo(int)),cw1,SLOT(onNokUpdate(int)));
+
 
 }
 //------------------------------------------------------------------------------
@@ -104,7 +91,10 @@ void ThreadManager::createClientDeclaration()
 void ThreadManager::start()
 {
     //start threads
-   thread1->start();
+    for (int i = 0; i < clientList.size(); ++i){
+    clientList[i].thread->start();
+    }
+
 }
 //------------------------------------------------------------------------------
 // Load settings
@@ -115,8 +105,6 @@ void ThreadManager::loadSettings()
         delete settings;
         settings = nullptr;
     }
-
-
     settings = new QSettings( QApplication::applicationDirPath() + "/settings.ini", QSettings::IniFormat );
     qDebug() << settings->status();
 
@@ -142,4 +130,13 @@ void ThreadManager::loadSettings()
     delete settings;
     settings = nullptr;
 }
+//------------------------------------------------------------------------------
+// Create view engine
+//------------------------------------------------------------------------------
+void ThreadManager::createViewEngine()
+{
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    QQuickWindow* window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
 
+    window->show();
+}

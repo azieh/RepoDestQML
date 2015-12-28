@@ -56,7 +56,7 @@ signals:
     void messageOk          (int );
     void messageKo          (int );
     void connectionStatus   (bool);
-    void loopTime           (const QString &text);
+    void loopTime           (const QString &);
 
 
 private slots:
