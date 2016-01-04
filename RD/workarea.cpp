@@ -246,7 +246,7 @@ void WorkArea::checkDbForPartOk( RepoDestDbStruct* dbStruct )
         sqlPcsDataStruct->usertim4             = _datetime;
 
         emit messageText(  "Fault time = " + ( QString::number ( _faultTimeElapsedMemorySeconds ) + " sec") );
-        emit messageText(  "_____________________________________");
+        emit messageText(  "-----------------------");
 
         // after read ok product data, set ack bit for PLC
         dbStruct->fault         = false;

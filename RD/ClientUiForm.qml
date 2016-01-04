@@ -22,6 +22,7 @@ GridLayout {
         target: clientWindow
         onLoopTimeUpdate:{
             timeText.text = text
+            gc()
         }
         onOkUpdate:{
             okText.text = text
@@ -30,7 +31,12 @@ GridLayout {
             nokText.text = text
         }
         onTextUpdate:{
-            textArea.append(text)
+            if (p1model.count == 22){
+               p1model.remove(0,1)
+            }
+
+            p1input.text = text
+            p1model.append({score: p1input.text})
         }
         onStationNameUpdate:{
             nameText.text = text
@@ -210,26 +216,52 @@ GridLayout {
             }
         }
     }
-    TextArea {
+    Rectangle{
         id: textArea
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
         Layout.fillHeight: true
         Layout.fillWidth: true
-        Layout.column: 2
+        Layout.column: 1
         Layout.row: 0
+        color: "#292929"
+        width: 200
+        height: 250
 
-        readOnly: true
-        frameVisible: false
-        antialiasing: false
-        rotation: 0
-        textColor: "#ffffff"
-        font { pointSize: 7; family: "Tahoma" }
-        style: TextAreaStyle {
-            backgroundColor : "#292929"
-            textColor: "#ffffff"
-            renderType: Text.NativeRendering
+
+
+        Component {
+            id: delegate
+            Item {
+                width: 200; height: 10
+                Label {
+                    text: score
+                }
+            }
+        }
+
+        Text {
+            id: p1input
+            visible: false
+            text: "Log/message"
+
 
         }
+
+        ListView {
+            id: p1scores
+            model: p1model
+            delegate: delegate
+            anchors.fill: parent
+        }
+
+        ListModel {
+            id: p1model
+            ListElement { score: "" }
+        }
+
+
+
+
 
         states: [
             State { when: textAreaStateVisible;

@@ -17,8 +17,13 @@ public:
     explicit ClientWindow(QObject *parent = 0);
 
      void createWindows(QQmlApplicationEngine& engine);
-     QQuickItem *clientObject;
+     QQuickItem*    clientObject;
 
+private:
+     QQuickWindow*  window;
+     QQuickItem*    root;
+     QQmlContext*   context;
+     QQmlComponent* component;
 signals:
      void nokUpdate(QString text);
      void okUpdate(QString text);
@@ -28,8 +33,8 @@ signals:
 
 public slots:
 
-     void onNokUpdate(int text);
-     void onOkUpdate(int text);
+     void onNokUpdate(int number);
+     void onOkUpdate(int number);
      void onLoopTimeUpdate(const QString &text);
      void onTextUpdate(const QString &text);
      void onStationNameUpdate(QString text);

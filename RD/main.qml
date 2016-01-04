@@ -6,17 +6,39 @@ import QtQuick.Layouts 1.1
 ApplicationWindow {
     id: mainWindow
     visible: true
+    width: 400
     title: qsTr("Raportowanie przestojów")
-    color: "#292929"
+    color: "#444444"
 
-    GridLayout {
+    Flow {
         id: gridLayout
-        rows: 10
-        columns: 5
-        columnSpacing: 1
-        rowSpacing: 1
+        spacing: 1.5
         objectName: "gridLayout"
         anchors.fill: parent
+        add: Transition {
+            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400 }
+            NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: 400 }
+        }
+
+        move: Transition {
+            SequentialAnimation {
+                PauseAnimation {
+                    duration: (gridLayout.ViewTransition.index -
+                               gridLayout.ViewTransition.targetIndexes[0]) * 100
+                }
+                ParallelAnimation {
+                    NumberAnimation {
+                        property: "x"; to: gridLayout.ViewTransition.item.x + 20
+                        easing.type: Easing.OutQuad
+                    }
+                    NumberAnimation {
+                        property: "y"; to: gridLayout.ViewTransition.item.y + 50
+                        easing.type: Easing.OutQuad
+                    }
+                }
+                NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutBounce }
+            }
+        }
     }
 }
 

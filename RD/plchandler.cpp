@@ -119,14 +119,14 @@ bool PlcHandler::_makeConnect()
                 _lastErrorMemory = QString::fromStdString(CliErrorText(result).c_str());
                 qWarning() << "Connection NOK" ;
                 qWarning() << "Problem is :" + QString::fromStdString(CliErrorText(result).c_str());
-                emit messageText( "Ip address of client is not set" );
+                emit messageText( "Connection NOK" );
             }
             // if we lost connection for a long time (like a 5 time try), we set initRun connection to make an init write to PLC DB
             _connectionTryWasFault++;
             if ( _connectionTryWasFault >=5 ){
                 initRun = true;
             }
-            emit messageText( "Each block transmitted is called PDU (protocol data unit) which is the greatest block that can be handled per transmission." );
+
             isConnected = plcClient->Connected();
 
             ko++;

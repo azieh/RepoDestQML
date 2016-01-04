@@ -23,12 +23,7 @@ ThreadManager::~ThreadManager()
     delete sqlH;
     sqlH = nullptr;
 
-    //Quit and clear every thread
-
-
-    //Clear memory about every station instance
-
-
+    clientList.clear();
 }
 //------------------------------------------------------------------------------
 // Create threads
@@ -76,14 +71,6 @@ void ThreadManager::createClientDeclaration()
         connect(clientList[i].client,SIGNAL(messageOk(int)),clientList[i].clientWindow,SLOT(onOkUpdate(int)));
         connect(clientList[i].client,SIGNAL(messageKo(int)),clientList[i].clientWindow,SLOT(onNokUpdate(int)));
     }
-
-
-//    cw1 = new ClientWindow();
-//    cw1->createWindows(engine);
-
-//    connect(st10,SIGNAL(messageKo(int)),cw1,SLOT(onNokUpdate(int)));
-
-
 }
 //------------------------------------------------------------------------------
 // Start threads
