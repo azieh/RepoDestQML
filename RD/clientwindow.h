@@ -15,29 +15,36 @@ class ClientWindow : public QObject
     Q_OBJECT
 public:
     explicit ClientWindow(QObject *parent = 0);
+    ~ClientWindow();
 
-     void createWindows(QQmlApplicationEngine& engine);
-     QQuickItem*    clientObject;
+    void createWindows(QQmlApplicationEngine& engine, QQuickWindow* window);
+    QQuickItem*    clientObject;
 
 private:
-     QQuickWindow*  window;
-     QQuickItem*    root;
-     QQmlContext*   context;
-     QQmlComponent* component;
+    QQuickItem*    root;
+    QQmlContext*   context;
+    QQmlComponent* component;
+
 signals:
-     void nokUpdate(QString text);
-     void okUpdate(QString text);
-     void loopTimeUpdate(QString text);
-     void textUpdate(QString text);
-     void stationNameUpdate(QString text);
+    void stationNameUpdate(QString text);
+    void connectionStatusUpdate(bool b);
+    void loopTimeUpdate(QString text);
+    void okUpdate(QString text);
+    void nokUpdate(QString text);
+    void textUpdate(QString text);
+    void ipUpdate(QString text);
+    void dbUpdate(QString text);
 
 public slots:
+    void onStationNameUpdate(QString text);
+    void onConnectionStatusUpdate(bool b);
+    void onLoopTimeUpdate(const QString &text);
+    void onOkUpdate(int number);
+    void onNokUpdate(int number);
+    void onTextUpdate(const QString &text);
+    void onIpUpdate(QString text);
+    void onDbUpdate(int number);
 
-     void onNokUpdate(int number);
-     void onOkUpdate(int number);
-     void onLoopTimeUpdate(const QString &text);
-     void onTextUpdate(const QString &text);
-     void onStationNameUpdate(QString text);
 };
 
 #endif // CLIENTWINDOW_H

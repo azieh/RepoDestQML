@@ -1,4 +1,5 @@
 #include "threadmanager.h"
+#include <QMessageBox>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickView>
 #include <QQmlEngine>
@@ -6,15 +7,16 @@
 #include <QtCore>
 #include <QtQuick/QtQuick>
 #include <QQmlComponent>
-#include <QtQml/qqml.h>
+
 
 ThreadManager::ThreadManager(QObject *parent) :
     QObject (parent),
     sqlH    (nullptr),
-    settings(nullptr)
+    settings(nullptr),
+    window  (nullptr)
 {
     loadSettings();
-    createThreads();
+    initSqlConnection();
     createViewEngine();
     createClientDeclaration();
 }
@@ -23,12 +25,18 @@ ThreadManager::~ThreadManager()
     delete sqlH;
     sqlH = nullptr;
 
+    delete settings;
+    settings = nullptr;
+
+    delete window;
+    window = nullptr;
+
     clientList.clear();
 }
 //------------------------------------------------------------------------------
-// Create threads
+// Init SQL Connection
 //------------------------------------------------------------------------------
-void ThreadManager::createThreads()
+void ThreadManager::initSqlConnection()
 {
     if ( sqlH != nullptr ){
         delete sqlH;
@@ -37,10 +45,6 @@ void ThreadManager::createThreads()
     sqlH = new SqlHandler;
     sqlH->setApuDatabasePath( _apuDbPath, _apuDbName );
     sqlH->setPcsDatabasePath( _pcsDbPath, _pcsDbName );
-
-    //first generete thread instance
-
-
 }
 //------------------------------------------------------------------------------
 // Create client objects and give them settings
@@ -63,13 +67,16 @@ void ThreadManager::createClientDeclaration()
         clientList[i].client -> setDbNumber( settingsList[i].dbNumber );
         clientList[i].client -> setName ( settingsList[i].stationName.data() );
 
-        clientList[i].clientWindow->createWindows(engine);
+        clientList[i].clientWindow->createWindows(engine, window);
         clientList[i].clientWindow->onStationNameUpdate( settingsList[i].stationName.data() );
+        clientList[i].clientWindow->onIpUpdate( settingsList[i].ipAddress.data() );
+        clientList[i].clientWindow->onDbUpdate( settingsList[i].dbNumber );
 
-        connect(clientList[i].client,SIGNAL(loopTime(const QString &)),clientList[i].clientWindow,SLOT(onLoopTimeUpdate(const QString &)));
-        connect(clientList[i].client,SIGNAL(messageText(const QString &)),clientList[i].clientWindow,SLOT(onTextUpdate(const QString &)));
-        connect(clientList[i].client,SIGNAL(messageOk(int)),clientList[i].clientWindow,SLOT(onOkUpdate(int)));
-        connect(clientList[i].client,SIGNAL(messageKo(int)),clientList[i].clientWindow,SLOT(onNokUpdate(int)));
+        connect(clientList[i].client,SIGNAL(loopTime( const QString & )),clientList[i].clientWindow,SLOT(onLoopTimeUpdate( const QString & )));
+        connect(clientList[i].client,SIGNAL(connectionStatus( bool )),clientList[i].clientWindow,SLOT(onConnectionStatusUpdate( bool )));
+        connect(clientList[i].client,SIGNAL(messageOk( int )),clientList[i].clientWindow,SLOT(onOkUpdate( int )));
+        connect(clientList[i].client,SIGNAL(messageKo( int )),clientList[i].clientWindow,SLOT(onNokUpdate( int )));
+        connect(clientList[i].client,SIGNAL(messageText( const QString & )),clientList[i].clientWindow,SLOT(onTextUpdate( const QString & )));
     }
 }
 //------------------------------------------------------------------------------
@@ -79,9 +86,8 @@ void ThreadManager::start()
 {
     //start threads
     for (int i = 0; i < clientList.size(); ++i){
-    clientList[i].thread->start();
+        clientList[i].thread->start();
     }
-
 }
 //------------------------------------------------------------------------------
 // Load settings
@@ -93,7 +99,7 @@ void ThreadManager::loadSettings()
         settings = nullptr;
     }
     settings = new QSettings( QApplication::applicationDirPath() + "/settings.ini", QSettings::IniFormat );
-    qDebug() << settings->status();
+    qDebug() << "Settings status:" << settings->status();
 
 
     _apuDbPath = settings->value( "APU_database/path" ).toString();
@@ -102,16 +108,23 @@ void ThreadManager::loadSettings()
     _pcsDbName = settings->value( "PCS_database/name" ).toString();
 
     int settingsSize = settings->beginReadArray("Logical_stations_settings");
+    if ( settingsSize == 0 ){
+        QMessageBox msgBox;
+        msgBox.setText( QObject::tr( " Wystąpił problem podczas otwarcia pliku 'settings.ini'. " ));
+        msgBox.setIcon( QMessageBox::Critical );
+        msgBox.exec();
+        exit(0);
+    }
     for ( int i = 0; i < settingsSize; ++i ){
 
-      settings->setArrayIndex( i );
-      settingsStruct singleSettings;
+        settings->setArrayIndex( i );
+        settingsStruct singleSettings;
 
-      singleSettings.ipAddress = settings->value( "Ip_address" ).toByteArray();
-      singleSettings.dbNumber = settings->value( "Db_number" ).toInt();
-      singleSettings.stationName = settings->value( "Station_name" ).toByteArray();
+        singleSettings.ipAddress = settings->value( "Ip_address" ).toByteArray();
+        singleSettings.dbNumber = settings->value( "Db_number" ).toInt();
+        singleSettings.stationName = settings->value( "Station_name" ).toByteArray();
 
-      settingsList.append( singleSettings );
+        settingsList.append( singleSettings );
     }
     settings->endArray();
     delete settings;
@@ -123,7 +136,10 @@ void ThreadManager::loadSettings()
 void ThreadManager::createViewEngine()
 {
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    QQuickWindow* window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
 
-    window->show();
+    if (window != nullptr){
+        delete window;
+        window = nullptr;
+    }
+    window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
 }

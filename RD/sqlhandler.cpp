@@ -68,6 +68,7 @@ bool SqlHandler::_openApuDatabase()
                           _apuDbPath.path()+_apuDbName+
                           "| Error: " + _database->lastError().text()
                           );
+        _closeDatabase();
     }
     return _database->isOpen ();
 }
@@ -94,6 +95,7 @@ bool SqlHandler::_openPcsDatabase()
                           "Cannot open Database " +
                           _pcsDbPath.path() + _pcsDbName +
                           "| Error: " + _database->lastError().text() );
+        _closeDatabase();
     }
     return _database->isOpen ();
 }

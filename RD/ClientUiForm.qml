@@ -5,7 +5,6 @@ import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
 
-
 GridLayout {
     id: mainGridLayout
     columnSpacing: 0
@@ -20,6 +19,13 @@ GridLayout {
     }
     Connections{
         target: clientWindow
+        onStationNameUpdate:{
+            nameText.text = text
+        }
+        onConnectionStatusUpdate:{
+            connectedImage.visible      = b
+            disconnectedImage.visible   = !b
+        }
         onLoopTimeUpdate:{
             timeText.text = text
             gc()
@@ -31,20 +37,24 @@ GridLayout {
             nokText.text = text
         }
         onTextUpdate:{
-            if (p1model.count == 22){
-               p1model.remove(0,1)
+            if ( logModel.count == 23 ){
+                logModel.remove(0,1)
             }
+            logInput.text = text
+            logModel.append({score: logInput.text})
+        }
+        onIpUpdate:{
+            ip.text = "Ip: " + text
+        }
+        onDbUpdate:{
+            db.text = "Db" + text
+        }
 
-            p1input.text = text
-            p1model.append({score: p1input.text})
-        }
-        onStationNameUpdate:{
-            nameText.text = text
-        }
+
     }
 
-    property bool textAreaStateVisible: true
-    property bool leftBarGridStateVisible: true
+    property bool textAreaStateVisible: false
+    property bool leftBarGridStateVisible: false
 
     GridLayout {
         id: leftMainBarGrid
@@ -69,6 +79,7 @@ GridLayout {
                 border.width: 1
             }
             InnerShadow {
+                id: leftBarNameInnerShadow
                 color: "#505050"
                 anchors.fill: leftBarNameRect
                 horizontalOffset: 4.3
@@ -79,6 +90,21 @@ GridLayout {
                 fast: true
                 samples: 8
                 source: leftBarNameRect
+                visible: textAreaStateVisible
+            }
+            InnerShadow {
+                id: leftBarNameMouseInnerShadow
+                color: "#505050"
+                anchors.fill: leftBarNameRect
+                horizontalOffset: 4.3
+                verticalOffset: 4.1
+                radius: 9.9
+                cached: true
+                spread: 0.7
+                fast: true
+                samples: 8
+                source: leftBarNameRect
+                visible: false
             }
             Text{
                 id:nameText
@@ -92,11 +118,18 @@ GridLayout {
             }
             MouseArea {
                 id: mouseArea
-                hoverEnabled: false
+                hoverEnabled: true
                 anchors.fill: parent
                 onClicked: {
                     textAreaStateVisible = !textAreaStateVisible
                     leftBarGridStateVisible = !leftBarGridStateVisible
+                    leftBarNameInnerShadow.visible = textAreaStateVisible
+                }
+                onEntered: {
+                    leftBarNameMouseInnerShadow.visible = true
+                }
+                onExited: {
+                    leftBarNameMouseInnerShadow.visible = false
                 }
             }
         }
@@ -125,6 +158,7 @@ GridLayout {
                 border.color: "#292929"
                 border.width: 1
                 ColumnLayout{
+                    spacing: 0
                     anchors.fill: parent
                     Layout.alignment: Qt.AlignCenter
                     Text{
@@ -133,10 +167,19 @@ GridLayout {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.topMargin: 1
                     }
-                    Text{
-                        id:statusText
-                        color: "#ffffff"
+                    Image {
+                        id: disconnectedImage
+                        fillMode: Image.Stretch
                         anchors.horizontalCenter: parent.horizontalCenter
+                        source: "ico/disconnected.png"
+                        visible: true
+                    }
+                    Image {
+                        id: connectedImage
+                        fillMode: Image.Stretch
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        source: "ico/connected.png"
+                        visible: false
                     }
                 }
             }
@@ -159,6 +202,7 @@ GridLayout {
                     }
                     Text{
                         id:timeText
+                        text: "9999ms"
                         color: "#ffffff"
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -216,6 +260,8 @@ GridLayout {
             }
         }
     }
+
+
     Rectangle{
         id: textArea
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
@@ -226,43 +272,43 @@ GridLayout {
         color: "#292929"
         width: 200
         height: 250
-
-
-
+        ColumnLayout{
+            anchors.fill: parent
+            Layout.alignment: Qt.AlignCenter
+            spacing: 0
+            Text{
+                id: areaTextInfo
+                color: "#747474"
+                font.pointSize: 7
+                text: "Log/message window:"
+            }
         Component {
-            id: delegate
+            id: logDelegate
             Item {
                 width: 200; height: 10
                 Label {
                     text: score
+                    color: "white"
                 }
             }
         }
-
         Text {
-            id: p1input
+            id: logInput
             visible: false
             text: "Log/message"
 
-
         }
-
         ListView {
-            id: p1scores
-            model: p1model
-            delegate: delegate
-            anchors.fill: parent
+            id: logWindow
+            model: logModel
+            delegate: logDelegate
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
-
         ListModel {
-            id: p1model
+            id: logModel
             ListElement { score: "" }
         }
-
-
-
-
-
         states: [
             State { when: textAreaStateVisible;
                 PropertyChanges {   target: textArea; opacity: 1.0; visible: true   }
@@ -273,6 +319,28 @@ GridLayout {
         ]
         transitions: Transition {
             NumberAnimation { property: "opacity"; duration: 300 }
+        }
+
+        }
+        Text{
+            id: db
+            anchors.right: textArea.right
+            anchors.bottom: textArea.bottom
+            Layout.column: 1
+            Layout.row: 0
+            color: "#747474"
+            font.pointSize: 7
+            text: "DB501"
+        }
+        Text{
+            id: ip
+            anchors.right: textArea.right
+            anchors.bottom: db.top
+            Layout.column: 1
+            Layout.row: 0
+            color: "#747474"
+            font.pointSize: 7
+            text: "Ip:192.168.1.1"
         }
     }
 }

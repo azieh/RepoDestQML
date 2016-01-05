@@ -5,77 +5,95 @@
 ClientWindow::ClientWindow(QObject *parent) :
     QObject     (parent),
     clientObject(nullptr),
-    window      (nullptr),
     root        (nullptr),
     context     (nullptr),
     component   (nullptr)
 {
 
 }
-void ClientWindow::createWindows(QQmlApplicationEngine& engine)
+ClientWindow::~ClientWindow()
 {
-    if (window != nullptr){
-        delete window;
-        window = nullptr;
-    }
-    window = new QQuickWindow;
-    window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
-    if (!window) {
-        qFatal("Error: Your root item has to be a window.");
-    }
+    delete clientObject;
+    clientObject = nullptr;
 
+    delete root;
+    root = nullptr;
+
+    delete context;
+    context = nullptr;
+
+    delete component;
+    component = nullptr;
+}
+//------------------------------------------------------------------------------
+// Create single client window
+//------------------------------------------------------------------------------
+void ClientWindow::createWindows(QQmlApplicationEngine& engine, QQuickWindow* window)
+{
     if (root != nullptr){
         delete root;
         root = nullptr;
     }
     root = new QQuickItem;
-    root = window->findChild<QQuickItem*>("gridLayout");
+    root = window->findChild<QQuickItem*>("gridLayout"); // find QML object where the window will be add
 
     if (component != nullptr){
         delete component;
         component = nullptr;
     }
-    component = new QQmlComponent(&engine, QUrl("qrc:/ClientUiForm.qml"));
-
+    component = new QQmlComponent(&engine, QUrl("qrc:/ClientUiForm.qml")); // load new QML window to engine
+    if ( component->isError() ){
+        qDebug() << component->errors();
+    }
     if (context != nullptr){
         delete context;
         context = nullptr;
     }
-    QQmlContext* context = new QQmlContext(engine.rootContext());
-    context->setContextProperty("clientWindow", this);
+    context = new QQmlContext(engine.rootContext());
+    context->setContextProperty("clientWindow", this); //create signals/slots connection between C++ and QML
 
     if (clientObject != nullptr ){
         clientObject->deleteLater();
         clientObject = nullptr;
     }
     clientObject = new QQuickItem;
-    clientObject = qobject_cast<QQuickItem*>(component->create(context));
-    if (component->isError()){
-        qWarning() << component->errorString();
-    }
+    clientObject = qobject_cast<QQuickItem*>(component->create(context)); //create complete QML object
+    clientObject->setParentItem(root); //and set it a parent item
 
     QQmlEngine::setObjectOwnership(clientObject, QQmlEngine::CppOwnership);
-
-    clientObject->setParentItem(root);
-
 }
-void ClientWindow::onNokUpdate(int number)
+//------------------------------------------------------------------------------
+// Signals and slots
+//------------------------------------------------------------------------------
+void ClientWindow::onStationNameUpdate(QString text)
 {
-    nokUpdate(QString::number(number));
+    stationNameUpdate(text);
 }
-void ClientWindow::onOkUpdate(int number)
+void ClientWindow::onConnectionStatusUpdate(bool b)
 {
-    okUpdate(QString::number(number));
+    connectionStatusUpdate(b);
 }
 void ClientWindow::onLoopTimeUpdate(const QString &text)
 {
     loopTimeUpdate(text);
 }
+void ClientWindow::onOkUpdate(int number)
+{
+    okUpdate(QString::number(number));
+}
+void ClientWindow::onNokUpdate(int number)
+{
+    nokUpdate(QString::number(number));
+}
 void ClientWindow::onTextUpdate(const QString &text)
 {
     textUpdate(text);
 }
-void ClientWindow::onStationNameUpdate(QString text)
+void ClientWindow::onIpUpdate(QString text)
 {
-    stationNameUpdate(text);
+    ipUpdate(text);
+}
+void ClientWindow::onDbUpdate(int number)
+{
+    dbUpdate(QString::number(number));
 }

@@ -161,7 +161,7 @@ bool PlcHandler::makeMultiRead(RepoDestDbStruct* dbStruct)
             PDULength-(14+4*Amunt*ItemsLenght), for NumItems=20 of byte it is 146. */
             _pduNegotation = _pduNegotation - ( 14 + 4 * ( 20 + 1 + 2 + 2 ) );
 
-            qDebug() << "PDU negotiation on multiread is: " + QString::number(_pduNegotation);
+            //qDebug() << "PDU negotiation on multiread is: " + QString::number(_pduNegotation);
             plcClient->SetParam( p_i32_PDURequest, &_pduNegotation );
 
             // Prepare struct
@@ -265,7 +265,7 @@ bool PlcHandler::makeMultiWrite(RepoDestDbStruct* dbStruct)
             /* PDU max payload is:
             PDULength-(14+4*Amunt*ItemsLenght), for NumItems=20 of byte it is 146. */
             _pduNegotation = _pduNegotation - ( 14 + 4 * ( 1 + 2 + 2 ) );
-            qDebug() << "PDU negotiation on multiwrite is: " + QString::number(_pduNegotation);
+            //qDebug() << "PDU negotiation on multiwrite is: " + QString::number(_pduNegotation);
             plcClient->SetParam( 10, &_pduNegotation );
 
             // Prepare struct

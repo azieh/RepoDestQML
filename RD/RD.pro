@@ -15,7 +15,7 @@ SOURCES     +=  main.cpp\
                 threadmanager.cpp \
                 sqlhandler.cpp \
                 plchandler.cpp \
-    clientwindow.cpp
+                clientwindow.cpp
 
 LIBS        += -L"$(MINGW)/lib" "C:\lib\snap7.lib"
 
@@ -34,8 +34,7 @@ RC_FILE     =   RepoDest.rc
 
 
 RESOURCES += qml.qrc \
-    img.qrc
-ico.qrc
+             ico.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

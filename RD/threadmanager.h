@@ -32,12 +32,13 @@ public:
     ~ThreadManager();
     SqlHandler* sqlH;
     QSettings* settings;
+    QQuickWindow* window;
     QQmlApplicationEngine engine;
     QList<settingsStruct> settingsList;
     QList<clientStruct> clientList;
 
 
-    void createThreads();
+    void initSqlConnection();
     void createClientDeclaration();
     void loadSettings();
     void createViewEngine();
