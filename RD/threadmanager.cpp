@@ -16,8 +16,8 @@ ThreadManager::ThreadManager(QObject *parent) :
     window  (nullptr)
 {
     loadSettings();
-    initSqlConnection();
     createViewEngine();
+    initSqlConnection();
     createClientDeclaration();
 }
 ThreadManager::~ThreadManager()
@@ -45,6 +45,15 @@ void ThreadManager::initSqlConnection()
     sqlH = new SqlHandler;
     sqlH->setApuDatabasePath( _apuDbPath, _apuDbName );
     sqlH->setPcsDatabasePath( _pcsDbPath, _pcsDbName );
+
+    connect(sqlH,SIGNAL(messageText(QString,QString)),this,SLOT(onTextUpdate(QString, QString)));
+    if ( !_apuDbName.isEmpty() ){
+        apuUpdate( _apuDbPath.path() + _apuDbName);
+    }
+    if ( !_pcsDbName.isEmpty() ){
+        pcsUpdate( _pcsDbPath.path() + _pcsDbName);
+    }
+
 }
 //------------------------------------------------------------------------------
 // Create client objects and give them settings
@@ -135,11 +144,18 @@ void ThreadManager::loadSettings()
 //------------------------------------------------------------------------------
 void ThreadManager::createViewEngine()
 {
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.rootContext()->setContextProperty("mainWindow", this);//create signals/slots connection between C++ and QML
+    engine.load(QUrl(QStringLiteral("qml//main.qml")));
+
 
     if (window != nullptr){
         delete window;
         window = nullptr;
     }
     window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
+}
+
+void ThreadManager::onTextUpdate(QString stName, QString text)
+{
+    textUpdate(stName, text);
 }

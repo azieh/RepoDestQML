@@ -47,10 +47,8 @@ GridLayout {
             ip.text = "Ip: " + text
         }
         onDbUpdate:{
-            db.text = "Db" + text
+            db.text = "DB" + text
         }
-
-
     }
 
     property bool textAreaStateVisible: false

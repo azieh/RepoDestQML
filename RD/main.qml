@@ -4,12 +4,27 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 
 ApplicationWindow {
-    id: mainWindow
     visible: true
-    maximumHeight: 460
+    maximumHeight: 500
     maximumWidth: 500
     title: qsTr("Raportowanie przestojów")
     color: "#444444"
+    Connections{
+        target: mainWindow
+        onTextUpdate:{
+            if ( logModel.count == 13 ){
+                logModel.remove(0,1)
+            }
+            logInput.text = stName + ": " +text
+            logModel.append({score: logInput.text})
+        }
+        onPcsUpdate:{
+            pcsName.text = "PCS database path: " + text
+        }
+        onApuUpdate:{
+            apuName.text = "APU database path: " + text
+        }
+    }
     Grid{
         columns: 1
         rows: 2
@@ -43,6 +58,7 @@ ApplicationWindow {
                     NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutBounce }
                 }
             }
+
         }
         Rectangle{
             id: textArea
@@ -80,11 +96,12 @@ ApplicationWindow {
                     id: logWindow
                     model: logModel
                     delegate: logDelegate
-                    anchors.fill: parent
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                 }
                 ListModel {
                     id: logModel
-                    ListElement { score: "" }
+                    ListElement { score: " " }
                 }
                 states: [
                     State { when: textAreaStateVisible;
@@ -110,11 +127,9 @@ ApplicationWindow {
             }
             Text{
                 id: pcsName
-
                 anchors.right: textArea.right
                 anchors.bottom: apuName.top
                 Layout.column: 1
-
                 color: "#747474"
                 font.pointSize: 7
                 text: "PCS database path: is not currently available"

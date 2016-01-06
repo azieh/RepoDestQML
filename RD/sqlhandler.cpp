@@ -39,12 +39,12 @@ bool SqlHandler::_openApuDatabase()
 {
     if ( !_apuDbPath.exists() ){
         if ( _apuDbPath.mkpath(".") ){
-            emit messageText( "LogMsg",
+            emit messageText( "System log",
                               "Program create dir path for DB file: " +
                               _apuDbPath.path()
                               );
         } else {
-            emit messageText( "LogMsg",
+            emit messageText( "System log",
                               "Program has problem with creating path: " +
                               _apuDbPath.path()
                               );
@@ -63,7 +63,7 @@ bool SqlHandler::_openApuDatabase()
 
 
     if ( !_database->open() ){
-        emit messageText( "LogMsg",
+        emit messageText( "System log",
                           "Cannot open Database " +
                           _apuDbPath.path()+_apuDbName+
                           "| Error: " + _database->lastError().text()
@@ -91,7 +91,7 @@ bool SqlHandler::_openPcsDatabase()
 
 
     if ( !_database->open() ){
-        emit messageText( "LogMsg",
+        emit messageText( "System log",
                           "Cannot open Database " +
                           _pcsDbPath.path() + _pcsDbName +
                           "| Error: " + _database->lastError().text() );
@@ -133,13 +133,13 @@ bool SqlHandler::_createApuTable_Breakes(SqlApuDataStruct* data)
             _query->prepare( command );
 
             if ( !_query->exec() ){
-                emit messageText( "LogMsg",
+                emit messageText( data->stationName,
                                   "SQL error when Table was created for " +
                                   data->stationName + "_PRZESTOJE" ": " +
                                   _query->lastError().text()
                                   );
             } else {
-                emit messageText( "LogMsg",
+                emit messageText( data->stationName,
                                   "SQL query: Correctly created table for " +
                                   data->stationName + "_PRZESTOJE"
                                   );
@@ -172,13 +172,13 @@ bool SqlHandler::_createApuTable_PartsInLastMinute(SqlApuDataStruct* data)
             _query->prepare( command );
 
             if ( !_query->exec() ){
-                emit messageText( "LogMsg",
+                emit messageText( data->stationName,
                                   "SQL error when Table was created for " +
                                   data->stationName + "_LICZNIK_SZTUK" +
                                   ": " + _query->lastError().text()
                                   );
             } else {
-                emit messageText( "LogMsg",
+                emit messageText( data->stationName,
                                   "SQL query: Correctly created table for " +
                                   data->stationName + "_LICZNIK_SZTUK"
                                   );
@@ -215,13 +215,13 @@ bool SqlHandler::insertValueIntoApu_Breakes(SqlApuDataStruct* data)
             _query->prepare( command );
 
             if ( !_query->exec( ) ){
-                emit messageText( "LogMsg",
+                emit messageText( data->stationName,
                                   "SQL error when Insert value for " +
                                   data->stationName + "_PRZESTOJE" +
                                   ": " + _query->lastError().text()
                                   );
             } else {
-                emit messageText( "LogMsg",
+                emit messageText( data->stationName,
                                   "SQL query: Correctly inserted value for " +
                                   data->stationName + "_PRZESTOJE"
                                   );
@@ -260,13 +260,13 @@ bool SqlHandler::insertValueIntoApu_PartsInLastMinute(SqlApuDataStruct* data)
             _query->prepare( command );
 
             if ( !_query->exec( ) ){
-                emit messageText( "LogMsg",
+                emit messageText( data->stationName,
                                   "SQL error when Insert value for " +
                                   data->stationName + "_LICZNIK_SZTUK" +
                                   ": " + _query->lastError().text()
                                   );
             } else {
-                emit messageText( "LogMsg",
+                emit messageText( data->stationName,
                                   "SQL query: Correctly inserted value for " +
                                   data->stationName + "_LICZNIK_SZTUK"
                                   );
@@ -351,13 +351,13 @@ bool SqlHandler::insertValueIntoPcs_GSTOP_DATA(SqlPcsDataStruct* data)
                 _query->bindValue( ":upload",    data->upload    );
 
                 if ( !_query->exec( ) ){
-                    emit messageText( "LogMsg",
+                    emit messageText( data->cellid,
                                       "SQL error when Insert value for "
                                       "GSTOP_DATA"
                                       ": " + _query->lastError().text()
                                       );
                 } else {
-                    emit messageText( "LogMsg",
+                    emit messageText( data->cellid,
                                       "SQL query: Correctly inserted value for "
                                       "GSTOP_DATA"
                                       );

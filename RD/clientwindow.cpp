@@ -41,7 +41,7 @@ void ClientWindow::createWindows(QQmlApplicationEngine& engine, QQuickWindow* wi
         delete component;
         component = nullptr;
     }
-    component = new QQmlComponent(&engine, QUrl("qrc:/ClientUiForm.qml")); // load new QML window to engine
+    component = new QQmlComponent(&engine, QUrl("qml//ClientUiForm.qml")); // load new QML window to engine
     if ( component->isError() ){
         qDebug() << component->errors();
     }

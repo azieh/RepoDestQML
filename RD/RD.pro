@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick widgets sql core
+QT += qml quick widgets sql core gui
 
 TARGET      = RepoDest
 TEMPLATE    = app
