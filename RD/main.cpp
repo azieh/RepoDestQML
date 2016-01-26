@@ -30,9 +30,8 @@ int main(int argc, char *argv[])
 
     ThreadManager tm;
     tm.start();
-    tm.window->show();
 
-    app.setQuitOnLastWindowClosed(true); // option to check what window was closed
+    app.setQuitOnLastWindowClosed(false); // option to check what window was closed
 
 
 

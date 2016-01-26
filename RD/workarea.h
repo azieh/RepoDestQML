@@ -1,10 +1,14 @@
 #ifndef WORKAREA_H
 #define WORKAREA_H
 
-#include <QObject>
-#include <QThread>
 #include "plchandler.h"
 #include "sqlhandler.h"
+
+#include <QThread>
+#include <QDebug>
+#include <QTimer>
+#include <QMutex>
+
 
 
 class WorkArea : public QObject

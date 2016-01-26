@@ -1,6 +1,3 @@
-#include <QDebug>
-#include <QTimer>
-#include <QMutex>
 #include "workarea.h"
 
 QMutex mutex;
@@ -60,12 +57,6 @@ WorkArea::WorkArea(SqlHandler* sqlHandler, QObject *parent) :
         sqlPcsDataStruct->upload    = 0;
     }
     _plcHandler = new PlcHandler;
-
-
-
-
-
-
 
 }
 WorkArea::~WorkArea()

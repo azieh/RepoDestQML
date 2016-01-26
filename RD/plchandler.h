@@ -38,7 +38,6 @@ public:
     bool initRun;
     void setIpAddress(const char* arg1);
     void setDbNumber(const int &arg1);
-
     bool makeMultiRead(RepoDestDbStruct* dbStruct);
     bool makeMultiWrite(RepoDestDbStruct* dbStruct);
 

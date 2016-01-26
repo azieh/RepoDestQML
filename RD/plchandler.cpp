@@ -117,8 +117,8 @@ bool PlcHandler::_makeConnect()
             int compareResoult = QString::compare( _currentError, _lastErrorMemory, Qt::CaseSensitive );
             if ( compareResoult != 0 && _connectionTryWasFault >=3 ) {
                 _lastErrorMemory = QString::fromStdString(CliErrorText(result).c_str());
-                qWarning() << "Connection NOK" ;
-                qWarning() << "Problem is :" + QString::fromStdString(CliErrorText(result).c_str());
+
+                qWarning() <<  + "Connection NOK :" + QString::fromStdString(CliErrorText(result).c_str());
                 emit messageText( "Connection NOK" );
             }
             // if we lost connection for a long time (like a 5 time try), we set initRun connection to make an init write to PLC DB

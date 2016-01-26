@@ -15,7 +15,8 @@ SOURCES     +=  main.cpp\
                 threadmanager.cpp \
                 sqlhandler.cpp \
                 plchandler.cpp \
-                clientwindow.cpp
+                clientwindow.cpp \
+                mainwindow.cpp
 
 LIBS        += -L"$(MINGW)/lib" "C:\lib\snap7.lib"
 
@@ -25,7 +26,8 @@ HEADERS     +=  \
                 threadmanager.h \
                 sqlhandler.h \
                 plchandler.h \
-    clientwindow.h
+                clientwindow.h \
+                mainwindow.h
 
 DISTFILES   +=  core/snap7.lib \
                 core/snap7.dll

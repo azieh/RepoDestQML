@@ -1,50 +1,46 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include <QSystemTrayIcon>
-#include "threadmanager.h"
+#include <QQmlApplicationEngine>
+#include <QtQuick/QQuickView>
+#include <QtQuick/QtQuick>
+#include <QMessageBox>
+#include <QMenu>
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+class MainWindow : public QObject
 {
-    Q_OBJECT
-
+        Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow();
     ~MainWindow();
-    ThreadManager* tm;
+
+    QQuickWindow*           window;
+    QSystemTrayIcon*        sysTray;
+
+    QPixmap                 _connectedIcon;
+    QPixmap                 _warningIcon;
+    QQmlApplicationEngine   engine;
 
 private:
-    Ui::MainWindow* ui;
-    QSystemTrayIcon* sysTray;
+    QMenu*      menu;
+    QAction*    viewWindow;
+    QAction*    quitAction;
 
-    QPixmap _connectedIcon;
-    QPixmap _warningIcon;
+    void        createViewEngine();
+    void        createSysTray();
 
-    void createThreadManager();
-    void setGuiConnection();
-    void setGuiSetup();
-    void createTrayIcon();
-
-
-
-private slots:
-    void plainTextEdit_textChanged(const QString &stName, const QString &arg1);
-    void labelStatus_Changed(const QString &stName, bool arg1);
-    void lineEditOk_Changed(const QString &stName, int arg1);
-    void lineEditNok_Changed(const QString &stName, int arg1);
-    void lineEditTime_Changed(const QString &stName, const QString &arg1);
-    void closeEvent(QCloseEvent * event);
-    void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void closeWindow();
 
 signals:
-    void startThread();
+    void textUpdate(QString stName, QString text);
+    void apuUpdate(QString text);
+    void pcsUpdate(QString text);
 
+public slots:
+    void closeEvent(QQuickCloseEvent* event);
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+    void closeWindow();
+    void onTextUpdate(QString stName, QString text);
 };
 
 #endif // MAINWINDOW_H

@@ -1,15 +1,15 @@
 #ifndef THREADMANAGER_H
 #define THREADMANAGER_H
 
-#include <QObject>
-#include <QQmlApplicationEngine>
-#include <QQmlComponent>
-#include <QQmlContext>
-#include <QQuickView>
-#include <QQmlEngine>
 #include "clientwindow.h"
 #include "workarea.h"
 #include "sqlhandler.h"
+#include "mainwindow.h"
+
+#include <QMessageBox>
+#include <QObject>
+#include <QtCore>
+
 
 struct settingsStruct {
     QByteArray ipAddress;
@@ -30,11 +30,10 @@ class ThreadManager : public QObject
 public:
     explicit ThreadManager(QObject *parent = 0);
     ~ThreadManager();
+
+    MainWindow*             mainWindow;
     SqlHandler*             sqlH;
     QSettings*              settings;
-    QQuickWindow*           window;
-    QQmlApplicationEngine   engine;
-
 
     QList<settingsStruct>   settingsList;
     QList<clientStruct>     clientList;
@@ -54,15 +53,9 @@ private:
     QString _pcsDbName;
 
 
-
-signals:
-    void textUpdate(QString stName, QString text);
-    void apuUpdate(QString text);
-    void pcsUpdate(QString text);
-
 public slots:
     void start();
-    void onTextUpdate(QString stName, QString text);
+
 
 };
 

@@ -1,35 +1,34 @@
 #include "threadmanager.h"
-#include <QMessageBox>
-#include <QtQuick/QQuickItem>
-#include <QtQuick/QQuickView>
-#include <QQmlEngine>
-#include <QtQml>
-#include <QtCore>
-#include <QtQuick/QtQuick>
-#include <QQmlComponent>
+
 
 
 ThreadManager::ThreadManager(QObject *parent) :
-    QObject (parent),
-    sqlH    (nullptr),
-    settings(nullptr),
-    window  (nullptr)
+    QObject     (parent),
+    mainWindow  (nullptr),
+    sqlH        (nullptr),
+    settings    (nullptr)
 {
+    if (mainWindow != nullptr){
+        delete mainWindow;
+        mainWindow = nullptr;
+    }
+    mainWindow = new MainWindow();
+
     loadSettings();
-    createViewEngine();
     initSqlConnection();
     createClientDeclaration();
+
 }
 ThreadManager::~ThreadManager()
 {
+    delete mainWindow;
+    mainWindow = nullptr;
+
     delete sqlH;
     sqlH = nullptr;
 
     delete settings;
     settings = nullptr;
-
-    delete window;
-    window = nullptr;
 
     clientList.clear();
 }
@@ -46,12 +45,12 @@ void ThreadManager::initSqlConnection()
     sqlH->setApuDatabasePath( _apuDbPath, _apuDbName );
     sqlH->setPcsDatabasePath( _pcsDbPath, _pcsDbName );
 
-    connect(sqlH,SIGNAL(messageText(QString,QString)),this,SLOT(onTextUpdate(QString, QString)));
+    connect(sqlH,SIGNAL(messageText(QString,QString)),mainWindow,SLOT(onTextUpdate(QString, QString)));
     if ( !_apuDbName.isEmpty() ){
-        apuUpdate( _apuDbPath.path() + _apuDbName);
+        mainWindow->apuUpdate( _apuDbPath.path() + _apuDbName);
     }
     if ( !_pcsDbName.isEmpty() ){
-        pcsUpdate( _pcsDbPath.path() + _pcsDbName);
+        mainWindow->pcsUpdate( _pcsDbPath.path() + _pcsDbName);
     }
 
 }
@@ -76,7 +75,7 @@ void ThreadManager::createClientDeclaration()
         clientList[i].client -> setDbNumber( settingsList[i].dbNumber );
         clientList[i].client -> setName ( settingsList[i].stationName.data() );
 
-        clientList[i].clientWindow->createWindows(engine, window);
+        clientList[i].clientWindow->createWindows(mainWindow->engine, mainWindow->window);
         clientList[i].clientWindow->onStationNameUpdate( settingsList[i].stationName.data() );
         clientList[i].clientWindow->onIpUpdate( settingsList[i].ipAddress.data() );
         clientList[i].clientWindow->onDbUpdate( settingsList[i].dbNumber );
@@ -97,6 +96,7 @@ void ThreadManager::start()
     for (int i = 0; i < clientList.size(); ++i){
         clientList[i].thread->start();
     }
+    mainWindow->window->hide();
 }
 //------------------------------------------------------------------------------
 // Load settings
@@ -139,23 +139,5 @@ void ThreadManager::loadSettings()
     delete settings;
     settings = nullptr;
 }
-//------------------------------------------------------------------------------
-// Create view engine
-//------------------------------------------------------------------------------
-void ThreadManager::createViewEngine()
-{
-    engine.rootContext()->setContextProperty("mainWindow", this);//create signals/slots connection between C++ and QML
-    engine.load(QUrl(QStringLiteral("qml//main.qml")));
 
 
-    if (window != nullptr){
-        delete window;
-        window = nullptr;
-    }
-    window = qobject_cast<QQuickWindow*>(engine.rootObjects().at(0));
-}
-
-void ThreadManager::onTextUpdate(QString stName, QString text)
-{
-    textUpdate(stName, text);
-}
