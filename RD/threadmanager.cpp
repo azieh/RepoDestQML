@@ -71,7 +71,12 @@ void ThreadManager::createClientDeclaration()
     for (int i = 0; i < clientList.size(); ++i){
         clientList[i].client -> doSetup( clientList[i].thread );
         clientList[i].client -> moveToThread( clientList[i].thread );
-        clientList[i].client -> setIpAddress( settingsList[i].ipAddress.data() );
+        clientList[i].client -> setPlcParameters(
+                    settingsList[i].plcType.data(),
+                    settingsList[i].ipAddress.data(),
+                    settingsList[i].rack,
+                    settingsList[i].slot
+                    );
         clientList[i].client -> setDbNumber( settingsList[i].dbNumber );
         clientList[i].client -> setName ( settingsList[i].stationName.data() );
 
@@ -116,6 +121,8 @@ void ThreadManager::loadSettings()
     _pcsDbPath = settings->value( "PCS_database/path" ).toString();
     _pcsDbName = settings->value( "PCS_database/name" ).toString();
 
+
+
     int settingsSize = settings->beginReadArray("Logical_stations_settings");
     if ( settingsSize == 0 ){
         QMessageBox msgBox;
@@ -128,10 +135,12 @@ void ThreadManager::loadSettings()
 
         settings->setArrayIndex( i );
         settingsStruct singleSettings;
-
-        singleSettings.ipAddress = settings->value( "Ip_address" ).toByteArray();
-        singleSettings.dbNumber = settings->value( "Db_number" ).toInt();
-        singleSettings.stationName = settings->value( "Station_name" ).toByteArray();
+        singleSettings.plcType      = settings->value( "PLC_type" ).toByteArray();
+        singleSettings.ipAddress    = settings->value( "Ip_address" ).toByteArray();
+        singleSettings.rack         = settings->value( "Rack" ).toInt();
+        singleSettings.slot         = settings->value( "Slot" ).toInt();
+        singleSettings.dbNumber     = settings->value( "Db_number" ).toInt();
+        singleSettings.stationName  = settings->value( "Station_name" ).toByteArray();
 
         settingsList.append( singleSettings );
     }

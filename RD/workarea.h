@@ -19,8 +19,8 @@ public:
     ~WorkArea();
 
     void doSetup        (QThread* cThread);
-    void setIpAddress   (const char* arg1);
-    void setDbNumber    (const int &arg1);
+    void setPlcParameters(const QString &typeOfPlc, const char* ip, const int rackOrLocalTsap, const int slotOrRemoteTsap);
+    void setDbNumber    (const int &dbNumber);
     void setName        (const char* arg1);
     RepoDestDbStruct*    dbStruct;
     SqlApuDataStruct*    sqlApuDataStruct;

@@ -9,8 +9,8 @@ GridLayout {
     id: mainGridLayout
     columnSpacing: 0
     rowSpacing: 0
-    Layout.maximumWidth: 250
-    Layout.maximumHeight: 250
+    Layout.maximumWidth: 500
+    Layout.maximumHeight: 500
     Layout.minimumWidth: 50
     Layout.minimumHeight: 50
 

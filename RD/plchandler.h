@@ -5,11 +5,6 @@
 
 #include "core/snap7.h"
 
-
-// Default value for
-const int PLCRACK  = 0; // Rack and
-const int PLCSLOT  = 2; // Slot
-
 struct RepoDestDbStruct{    // Struct of RepoDest DB
     QString reference;
     bool    fault;
@@ -36,8 +31,8 @@ public:
     int ko;// = 0; // Number of test failure
 
     bool initRun;
-    void setIpAddress(const char* arg1);
-    void setDbNumber(const int &arg1);
+    void setPlcParameters(const QString &typeOfPlc, const char* ip, const int rackOrLocalTsap, const int slotOrRemoteTsap);
+    void setDbNumber(const int &dbNumber);
     bool makeMultiRead(RepoDestDbStruct* dbStruct);
     bool makeMultiWrite(RepoDestDbStruct* dbStruct);
 
@@ -46,7 +41,12 @@ private:
     QString         _currentError;
     QString         _lastErrorMemory;
 
+    QString         _typeOfPlc;            // Type of PLC device like "S7-200", "S7-300", "S1200"
     const char*     _address;              // PLC IP Address
+    int             _rack;                 // PLC Rack  - only in case of use Siemens S7-300, S1200
+    int             _slot;                 // PLC Slot /
+    int             _localTsap;            // PC-local TSAP   - only in case of use Siemens S7-200
+    int             _remoteTsap;           // PLC-remote TSAP /
     int             _dbNumber;             // Number of RepoDest DB
     int             _connectionTryWasFault;// Number of fault connection
     int32_t         _pduNegotation;        // Size of S7 PDU ethernet frame

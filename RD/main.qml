@@ -5,8 +5,8 @@ import QtQuick.Layouts 1.1
 
 ApplicationWindow {
     visible: true
-    maximumHeight: 500
-    maximumWidth: 500
+    maximumHeight: 510
+    maximumWidth: 510
     title: qsTr("Raportowanie przestojów")
     color: "#444444"
     Connections{
@@ -32,7 +32,7 @@ ApplicationWindow {
         spacing: 2
         Flow {
             id: gridLayout
-            width: 500
+            width: 510
             spacing: 1.5
             objectName: "gridLayout"
             add: Transition {

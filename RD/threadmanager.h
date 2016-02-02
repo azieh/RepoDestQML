@@ -12,7 +12,10 @@
 
 
 struct settingsStruct {
+    QByteArray plcType;
     QByteArray ipAddress;
+    int rack;
+    int slot;
     int dbNumber;
     QByteArray stationName;
 };

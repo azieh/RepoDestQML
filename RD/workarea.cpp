@@ -312,13 +312,13 @@ QString WorkArea::pcsRecIdGenerator()
 //------------------------------------------------------------------------------
 // Signals and slot area
 //------------------------------------------------------------------------------
-void WorkArea::setIpAddress(const char *arg1)
+void WorkArea::setPlcParameters(const QString &typeOfPlc, const char* ip, const int rackOrLocalTsap, const int slotOrRemoteTsap)
 {
-    _plcHandler->setIpAddress( arg1 );
+    _plcHandler->setPlcParameters( typeOfPlc, ip, rackOrLocalTsap, slotOrRemoteTsap );
 }
-void WorkArea::setDbNumber(const int &arg1)
+void WorkArea::setDbNumber(const int &dbNumber)
 {
-    _plcHandler->setDbNumber( arg1 );
+    _plcHandler->setDbNumber( dbNumber );
 }
 void WorkArea::setName(const char *arg1)
 {

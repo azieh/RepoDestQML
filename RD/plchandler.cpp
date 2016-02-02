@@ -40,17 +40,40 @@ PlcHandler::~PlcHandler()
     delete _address;
     _address = nullptr;
 }
-void PlcHandler::setIpAddress(const char* arg1)
+//------------------------------------------------------------------------------
+// Set PLC parameters
+//------------------------------------------------------------------------------
+void PlcHandler::setPlcParameters(const QString &typeOfPlc, const char* ip, const int rackOrLocalTsap, const int slotOrRemoteTsap)
 {
+    _typeOfPlc = typeOfPlc;
+
     if ( _address != nullptr){
         delete _address;
         _address = nullptr;
     }
-    _address = arg1;
+    _address = ip;
+
+    if ( _typeOfPlc == "S7200" ){
+        _rack = 0;
+        _localTsap = rackOrLocalTsap;
+
+        _slot = 0;
+        _remoteTsap = slotOrRemoteTsap;
+    }
+    else if ( _typeOfPlc == "S7300" || _typeOfPlc == "S1200"){
+        _rack = rackOrLocalTsap;
+        _localTsap = 0;
+
+        _slot = slotOrRemoteTsap;
+        _remoteTsap = 0;
+    }
 }
-void PlcHandler::setDbNumber(const int &arg1)
+//------------------------------------------------------------------------------
+// Set DB number
+//------------------------------------------------------------------------------
+void PlcHandler::setDbNumber(const int &dbNumber)
 {
-    _dbNumber = arg1;
+    _dbNumber = dbNumber;
 }
 //------------------------------------------------------------------------------
 // Unit Connection
@@ -66,13 +89,21 @@ bool PlcHandler::_makeConnect()
             delete plcClient;
             plcClient = nullptr;
         }
-        int32_t timeout = 500;          // create int32_t object to handle SetParam value for plcClient object
+        int32_t timeout = 1000;          // create int32_t object to handle SetParam value for plcClient object
         plcClient = new TS7Client();
         plcClient->SetParam( p_i32_PingTimeout, &timeout );
         plcClient->SetParam( p_i32_SendTimeout, &timeout );
         plcClient->SetParam( p_i32_RecvTimeout, &timeout );
-
-        result = plcClient->ConnectTo(_address,PLCRACK,PLCSLOT);
+        if ( _typeOfPlc == "S7200" ){
+            plcClient->SetConnectionParams(_address, _localTsap, _remoteTsap);
+            result = plcClient->Connect();
+        }
+        else if ( _typeOfPlc == "S7300" || _typeOfPlc == "S1200"){
+            result = plcClient->ConnectTo(_address, _rack, _slot);
+        }
+        else {
+            emit messageText( "Please fill PLC type name corectly" );
+        }
         _pduNegotation = plcClient->PDULength();
 
         // checking of connection in time
@@ -82,8 +113,8 @@ bool PlcHandler::_makeConnect()
                 initRun = false;
                 qDebug() <<       "Connected to " +
                                   QString::fromStdString(_address) +
-                                  " (Rack=" + QString::number(PLCRACK) +
-                                  ", Slot=" + QString::number(PLCSLOT) +
+                                  " (Rack=" + QString::number(_rack) +
+                                  ", Slot=" + QString::number(_slot) +
                                   ")"
                                   ;
 
@@ -166,41 +197,71 @@ bool PlcHandler::makeMultiRead(RepoDestDbStruct* dbStruct)
 
             // Prepare struct
             TS7DataItem Items[4];
-
-            // NOTE : *AMOUNT IS NOT SIZE* , it's the number of items
-
             byte referenceBuffer [20];
-            Items[0].Area     = S7AreaDB;
-            Items[0].WordLen  = S7WLByte;
-            Items[0].DBNumber = _dbNumber;
-            Items[0].Start    = 0;
-            Items[0].Amount   = 20;
-            Items[0].pdata    = &referenceBuffer;
-
             byte bitBuffer [1];
-            Items[1].Area     = S7AreaDB;
-            Items[1].WordLen  = S7WLByte;
-            Items[1].DBNumber = _dbNumber;
-            Items[1].Start    = 20;
-            Items[1].Amount   = 1;
-            Items[1].pdata    = &bitBuffer;
-
             byte faultBuffer[2];
-            Items[2].Area     = S7AreaDB;
-            Items[2].WordLen  = S7WLByte;
-            Items[2].DBNumber = _dbNumber;
-            Items[2].Start    = 30;
-            Items[2].Amount   = 2;
-            Items[2].pdata    = &faultBuffer;
-
             byte partsBuffer[2];
-            Items[3].Area     = S7AreaDB;
-            Items[3].WordLen  = S7WLByte;
-            Items[3].DBNumber = _dbNumber;
-            Items[3].Start    = 32;
-            Items[3].Amount   = 2;
-            Items[3].pdata    = &partsBuffer;
+            // NOTE : *AMOUNT IS NOT SIZE* , it's the number of items
+            if ( _typeOfPlc == "S7200" ){
 
+                Items[0].Area     = S7AreaDB;
+                Items[0].WordLen  = S7WLByte;
+                Items[0].DBNumber = 1;
+                Items[0].Start    = _dbNumber;
+                Items[0].Amount   = 20;
+                Items[0].pdata    = &referenceBuffer;
+
+                Items[1].Area     = S7AreaDB;
+                Items[1].WordLen  = S7WLByte;
+                Items[1].DBNumber = 1;
+                Items[1].Start    = _dbNumber + 20;
+                Items[1].Amount   = 1;
+                Items[1].pdata    = &bitBuffer;
+
+                Items[2].Area     = S7AreaDB;
+                Items[2].WordLen  = S7WLByte;
+                Items[2].DBNumber = 1;
+                Items[2].Start    = _dbNumber + 30;
+                Items[2].Amount   = 2;
+                Items[2].pdata    = &faultBuffer;
+
+                Items[3].Area     = S7AreaDB;
+                Items[3].WordLen  = S7WLByte;
+                Items[3].DBNumber = 1;
+                Items[3].Start    = _dbNumber + 32;
+                Items[3].Amount   = 2;
+                Items[3].pdata    = &partsBuffer;
+            }
+            else if ( _typeOfPlc == "S7300" || _typeOfPlc == "S1200"){
+
+                Items[0].Area     = S7AreaDB;
+                Items[0].WordLen  = S7WLByte;
+                Items[0].DBNumber = _dbNumber;
+                Items[0].Start    = 0;
+                Items[0].Amount   = 20;
+                Items[0].pdata    = &referenceBuffer;
+
+                Items[1].Area     = S7AreaDB;
+                Items[1].WordLen  = S7WLByte;
+                Items[1].DBNumber = _dbNumber;
+                Items[1].Start    = 20;
+                Items[1].Amount   = 1;
+                Items[1].pdata    = &bitBuffer;
+
+                Items[2].Area     = S7AreaDB;
+                Items[2].WordLen  = S7WLByte;
+                Items[2].DBNumber = _dbNumber;
+                Items[2].Start    = 30;
+                Items[2].Amount   = 2;
+                Items[2].pdata    = &faultBuffer;
+
+                Items[3].Area     = S7AreaDB;
+                Items[3].WordLen  = S7WLByte;
+                Items[3].DBNumber = _dbNumber;
+                Items[3].Start    = 32;
+                Items[3].Amount   = 2;
+                Items[3].pdata    = &partsBuffer;
+            }
             result = plcClient->ReadMultiVars( &Items[0], 4 );
 
             if ( result == 0 )
@@ -270,41 +331,78 @@ bool PlcHandler::makeMultiWrite(RepoDestDbStruct* dbStruct)
 
             // Prepare struct
             TS7DataItem Items[3];
-
-            // NOTE : *AMOUNT IS NOT SIZE* , it's the number of items
             byte bitBuffer [1];
-            SetBitAt( &bitBuffer, 0, 0, dbStruct->fault );
-            SetBitAt( &bitBuffer, 0, 1, dbStruct->fault_ack );
-            SetBitAt( &bitBuffer, 0, 2, dbStruct->part_ok );
-            SetBitAt( &bitBuffer, 0, 3, dbStruct->part_ok_ack );
-
-            Items[0].Area     = S7AreaDB;
-            Items[0].WordLen  = S7WLByte;
-            Items[0].DBNumber = _dbNumber;
-            Items[0].Start    = 20;
-            Items[0].Amount   = 1;
-            Items[0].pdata    = &bitBuffer;
-
             byte faultBuffer[2];
-            SetIntAt( &faultBuffer, 0, dbStruct->fault_number);
-
-            Items[1].Area     = S7AreaDB;
-            Items[1].WordLen  = S7WLByte;
-            Items[1].DBNumber = _dbNumber;
-            Items[1].Start    = 30;
-            Items[1].Amount   = 2;
-            Items[1].pdata    = &faultBuffer;
-
             byte partsBuffer[2];
-            SetIntAt( &partsBuffer, 0, dbStruct->fault_number);
 
-            Items[2].Area     = S7AreaDB;
-            Items[2].WordLen  = S7WLByte;
-            Items[2].DBNumber = _dbNumber;
-            Items[2].Start    = 32;
-            Items[2].Amount   = 2;
-            Items[2].pdata    = &partsBuffer;
+            if ( _typeOfPlc == "S7200" ){
+                // NOTE : *AMOUNT IS NOT SIZE* , it's the number of items
 
+                SetBitAt( &bitBuffer, 0, 0, dbStruct->fault );
+                SetBitAt( &bitBuffer, 0, 1, dbStruct->fault_ack );
+                SetBitAt( &bitBuffer, 0, 2, dbStruct->part_ok );
+                SetBitAt( &bitBuffer, 0, 3, dbStruct->part_ok_ack );
+
+                Items[0].Area     = S7AreaDB;
+                Items[0].WordLen  = S7WLByte;
+                Items[0].DBNumber = 1;
+                Items[0].Start    = _dbNumber + 20;
+                Items[0].Amount   = 1;
+                Items[0].pdata    = &bitBuffer;
+
+
+                SetIntAt( &faultBuffer, 0, dbStruct->fault_number);
+
+                Items[1].Area     = S7AreaDB;
+                Items[1].WordLen  = S7WLByte;
+                Items[1].DBNumber = 1;
+                Items[1].Start    = _dbNumber + 30;
+                Items[1].Amount   = 2;
+                Items[1].pdata    = &faultBuffer;
+
+
+                SetIntAt( &partsBuffer, 0, dbStruct->partsInLastMinute);
+
+                Items[2].Area     = S7AreaDB;
+                Items[2].WordLen  = S7WLByte;
+                Items[2].DBNumber = 1;
+                Items[2].Start    = _dbNumber + 32;
+                Items[2].Amount   = 2;
+                Items[2].pdata    = &partsBuffer;
+            }
+            else if ( _typeOfPlc == "S7300" || _typeOfPlc == "S1200"){
+                // NOTE : *AMOUNT IS NOT SIZE* , it's the number of items
+
+                SetBitAt( &bitBuffer, 0, 0, dbStruct->fault );
+                SetBitAt( &bitBuffer, 0, 1, dbStruct->fault_ack );
+                SetBitAt( &bitBuffer, 0, 2, dbStruct->part_ok );
+                SetBitAt( &bitBuffer, 0, 3, dbStruct->part_ok_ack );
+
+                Items[0].Area     = S7AreaDB;
+                Items[0].WordLen  = S7WLByte;
+                Items[0].DBNumber = _dbNumber;
+                Items[0].Start    = 20;
+                Items[0].Amount   = 1;
+                Items[0].pdata    = &bitBuffer;
+
+                SetIntAt( &faultBuffer, 0, dbStruct->fault_number);
+
+                Items[1].Area     = S7AreaDB;
+                Items[1].WordLen  = S7WLByte;
+                Items[1].DBNumber = _dbNumber;
+                Items[1].Start    = 30;
+                Items[1].Amount   = 2;
+                Items[1].pdata    = &faultBuffer;
+
+                SetIntAt( &partsBuffer, 0, dbStruct->partsInLastMinute);
+
+                Items[2].Area     = S7AreaDB;
+                Items[2].WordLen  = S7WLByte;
+                Items[2].DBNumber = _dbNumber;
+                Items[2].Start    = 32;
+                Items[2].Amount   = 2;
+                Items[2].pdata    = &partsBuffer;
+            }
             result=plcClient->WriteMultiVars(&Items[0],3);
             _check(result,"Multiwrite Vars");
 

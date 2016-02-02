@@ -10,7 +10,7 @@ MainWindow::MainWindow() :
     createViewEngine();
     createSysTray();
 
-    connect(window, SIGNAL(closing(QQuickCloseEvent*)), this, SLOT(closeEvent(QQuickCloseEvent*)));
+    connect(window, SIGNAL(closing(QQuickCloseEvent*)), this, SLOT(closeEvent(QQuickCloseEvent*))); //connection close window event with messages on system try
 }
 MainWindow::~MainWindow()
 {
@@ -34,7 +34,6 @@ void MainWindow::createViewEngine()
     engine.rootContext()->setContextProperty("mainWindow", this);//create signals/slots connection between C++ and QML
     engine.load(QUrl::fromLocalFile(QStringLiteral("qml/main.qml")));
 
-
     if (window != nullptr){
         delete window;
         window = nullptr;
@@ -47,7 +46,6 @@ void MainWindow::createViewEngine()
 void MainWindow::closeEvent(QQuickCloseEvent* event)
 {
     window->hide();
-
     QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon();
     sysTray->showMessage(tr("Raportowanie przestojów"),
                          "Program działa cały czas w tle.",
