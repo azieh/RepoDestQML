@@ -85,11 +85,19 @@ void ThreadManager::createClientDeclaration()
         clientList[i].clientWindow->onIpUpdate( settingsList[i].ipAddress.data() );
         clientList[i].clientWindow->onDbUpdate( settingsList[i].dbNumber );
 
+        //connect signals from PLC handler directly to defined for that client GUI
         connect(clientList[i].client,SIGNAL(loopTime( const QString & )),clientList[i].clientWindow,SLOT(onLoopTimeUpdate( const QString & )));
         connect(clientList[i].client,SIGNAL(connectionStatus( bool )),clientList[i].clientWindow,SLOT(onConnectionStatusUpdate( bool )));
         connect(clientList[i].client,SIGNAL(messageOk( int )),clientList[i].clientWindow,SLOT(onOkUpdate( int )));
         connect(clientList[i].client,SIGNAL(messageKo( int )),clientList[i].clientWindow,SLOT(onNokUpdate( int )));
         connect(clientList[i].client,SIGNAL(messageText( const QString & )),clientList[i].clientWindow,SLOT(onTextUpdate( const QString & )));
+
+        //connect signal from open client window to close all other windows. only one client window can be open at one time
+        for ( int j=0; j < clientList.size(); ++j){
+            if ( i != j){
+                connect(clientList[i].clientWindow->clientObject,SIGNAL(clientWindowWasClicked( bool )),clientList[j].clientWindow,SLOT(onHideClientWindow( bool )));
+            }
+        }
     }
 }
 //------------------------------------------------------------------------------

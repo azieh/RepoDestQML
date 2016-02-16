@@ -32,8 +32,11 @@ MainWindow::~MainWindow()
 void MainWindow::createViewEngine()
 {
     engine.rootContext()->setContextProperty("mainWindow", this);//create signals/slots connection between C++ and QML
+#ifdef QT_DEBUG
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+#else
     engine.load(QUrl::fromLocalFile(QStringLiteral("qml/main.qml")));
-
+#endif
     if (window != nullptr){
         delete window;
         window = nullptr;

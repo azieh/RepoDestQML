@@ -41,8 +41,11 @@ void ClientWindow::createWindows(QQmlApplicationEngine& engine, QQuickWindow* wi
         delete component;
         component = nullptr;
     }
-
+#ifdef QT_DEBUG
+    component = new QQmlComponent(&engine, QUrl("qrc:/ClientUiForm.qml")); // load new QML window to engine
+#else
     component = new QQmlComponent(&engine, QUrl::fromLocalFile("qml/ClientUiForm.qml")); // load new QML window to engine
+#endif
     if ( component->isError() ){
         qDebug() << component->errors();
     }
@@ -66,6 +69,10 @@ void ClientWindow::createWindows(QQmlApplicationEngine& engine, QQuickWindow* wi
 //------------------------------------------------------------------------------
 // Signals and slots
 //------------------------------------------------------------------------------
+void ClientWindow::onHideClientWindow(bool b)
+{
+    hideClientWindow(b);
+}
 void ClientWindow::onStationNameUpdate(QString text)
 {
     stationNameUpdate(text);

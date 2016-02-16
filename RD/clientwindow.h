@@ -26,6 +26,7 @@ private:
     QQmlComponent* component;
 
 signals:
+    void hideClientWindow(bool b);
     void stationNameUpdate(QString text);
     void connectionStatusUpdate(bool b);
     void loopTimeUpdate(QString text);
@@ -36,6 +37,7 @@ signals:
     void dbUpdate(QString text);
 
 public slots:
+    void onHideClientWindow(bool b);
     void onStationNameUpdate(QString text);
     void onConnectionStatusUpdate(bool b);
     void onLoopTimeUpdate(const QString &text);

@@ -19,6 +19,12 @@ GridLayout {
     }
     Connections{
         target: clientWindow
+
+        onHideClientWindow:{
+            textAreaStateVisible = false
+            leftBarGridStateVisible = false
+            leftBarNameInnerShadow.visible = false
+        }
         onStationNameUpdate:{
             nameText.text = text
         }
@@ -53,6 +59,7 @@ GridLayout {
 
     property bool textAreaStateVisible: false
     property bool leftBarGridStateVisible: false
+    signal clientWindowWasClicked(bool x)
 
     GridLayout {
         id: leftMainBarGrid
@@ -122,6 +129,7 @@ GridLayout {
                     textAreaStateVisible = !textAreaStateVisible
                     leftBarGridStateVisible = !leftBarGridStateVisible
                     leftBarNameInnerShadow.visible = textAreaStateVisible
+                    clientWindowWasClicked( true )
                 }
                 onEntered: {
                     leftBarNameMouseInnerShadow.visible = true
@@ -194,7 +202,7 @@ GridLayout {
                     Layout.alignment: Qt.AlignCenter
                     Text{
                         color: "#ffffff"
-                        text: "1L time"
+                        text: "Time"
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.topMargin: 1
                     }
@@ -290,11 +298,11 @@ GridLayout {
                 }
             }
         }
-        Text {
+        TextArea {
             id: logInput
             visible: false
             text: "Log/message"
-
+            width: 200
         }
         ListView {
             id: logWindow

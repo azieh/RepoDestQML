@@ -82,7 +82,7 @@ bool PlcHandler::_makeConnect()
 {
     _checkOkKo();                       // check OK and KO value - reset to 0 when OK + KO >= 1000
 
-    int result = 0;
+    int result = 99;
     if ( _address != nullptr ){         // checking if Ip address is correctly set
         if ( plcClient != nullptr ){    // destroy plcClient object if exist
             plcClient->Disconnect();
@@ -94,6 +94,7 @@ bool PlcHandler::_makeConnect()
         plcClient->SetParam( p_i32_PingTimeout, &timeout );
         plcClient->SetParam( p_i32_SendTimeout, &timeout );
         plcClient->SetParam( p_i32_RecvTimeout, &timeout );
+
         if ( _typeOfPlc == "S7200" ){
             plcClient->SetConnectionParams(_address, _localTsap, _remoteTsap);
             result = plcClient->Connect();
@@ -101,13 +102,11 @@ bool PlcHandler::_makeConnect()
         else if ( _typeOfPlc == "S7300" || _typeOfPlc == "S1200"){
             result = plcClient->ConnectTo(_address, _rack, _slot);
         }
-        else {
-            emit messageText( "Please fill PLC type name corectly" );
-        }
+
         _pduNegotation = plcClient->PDULength();
 
         // checking of connection in time
-        if ( ( result ==0 && isConnected == false ) ){
+        if ( ( result == 0 && isConnected == false ) ){
 
             if ( initRun == true || _connectionTryWasFault >= 5 ){
                 initRun = false;
@@ -145,6 +144,11 @@ bool PlcHandler::_makeConnect()
 
         } else if ( result != 0 ){
             _currentError = QString::fromStdString(CliErrorText(result).c_str());
+
+            if ( _typeOfPlc != "S7200" && _typeOfPlc != "S7300" && _typeOfPlc != "S1200"){
+            _currentError = "Please fill PLC type name corectly";
+            }
+
             int compareResoult = QString::compare( _currentError, _lastErrorMemory, Qt::CaseSensitive );
             if ( compareResoult != 0 && _connectionTryWasFault >=3 ) {
                 _lastErrorMemory = QString::fromStdString(CliErrorText(result).c_str());

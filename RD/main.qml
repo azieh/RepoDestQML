@@ -78,8 +78,9 @@ ApplicationWindow {
                 Component {
                     id: logDelegate
                     Item {
-                        width: 200; height: 10
-                        Label {
+                        width: 500; height: 10
+                        Text {
+                            anchors.fill: parent
                             text: score
                             color: "white"
                         }
@@ -89,9 +90,7 @@ ApplicationWindow {
                     id: logInput
                     visible: false
                     text: "Log/message"
-
                 }
-
                 ListView {
                     id: logWindow
                     model: logModel
