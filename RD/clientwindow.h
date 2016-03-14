@@ -24,6 +24,7 @@ private:
     QQuickItem*    root;
     QQmlContext*   context;
     QQmlComponent* component;
+    QQuickWindow*  window_memory;
 
 signals:
     void hideClientWindow(bool b);
@@ -38,6 +39,7 @@ signals:
 
 public slots:
     void onHideClientWindow(bool b);
+    void onShowClientWindow(bool b);
     void onStationNameUpdate(QString text);
     void onConnectionStatusUpdate(bool b);
     void onLoopTimeUpdate(const QString &text);

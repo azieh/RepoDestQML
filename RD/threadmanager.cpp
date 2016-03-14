@@ -96,6 +96,7 @@ void ThreadManager::createClientDeclaration()
         for ( int j=0; j < clientList.size(); ++j){
             if ( i != j){
                 connect(clientList[i].clientWindow->clientObject,SIGNAL(clientWindowWasClicked( bool )),clientList[j].clientWindow,SLOT(onHideClientWindow( bool )));
+
             }
         }
     }

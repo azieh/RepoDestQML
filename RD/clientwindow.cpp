@@ -35,7 +35,7 @@ void ClientWindow::createWindows(QQmlApplicationEngine& engine, QQuickWindow* wi
         root = nullptr;
     }
     root = new QQuickItem;
-    root = window->findChild<QQuickItem*>("gridLayout"); // find QML object where the window will be add
+    root = window->findChild<QQuickItem*>("gridLayoutRest"); // find QML object where the window will be add
 
     if (component != nullptr){
         delete component;
@@ -64,14 +64,25 @@ void ClientWindow::createWindows(QQmlApplicationEngine& engine, QQuickWindow* wi
     clientObject = qobject_cast<QQuickItem*>(component->create(context)); //create complete QML object
     clientObject->setParentItem(root); //and set it a parent item
 
+
     QQmlEngine::setObjectOwnership(clientObject, QQmlEngine::CppOwnership);
+
+    connect(this->clientObject, SIGNAL(clientWindowWasClicked( bool )), this, SLOT(onShowClientWindow(bool)));
+    window_memory = window;
 }
 //------------------------------------------------------------------------------
 // Signals and slots
 //------------------------------------------------------------------------------
+void ClientWindow::onShowClientWindow(bool b)
+{
+    root = window_memory->findChild<QQuickItem*>("gridLayoutFirst"); // find QML object where the window will be add
+    clientObject->setParentItem(root);
+}
 void ClientWindow::onHideClientWindow(bool b)
 {
     hideClientWindow(b);
+    root = window_memory->findChild<QQuickItem*>("gridLayoutRest"); // find QML object where the window will be add
+    clientObject->setParentItem(root);
 }
 void ClientWindow::onStationNameUpdate(QString text)
 {
