@@ -80,7 +80,7 @@ void ThreadManager::createClientDeclaration()
         clientList[i].client -> setDbNumber( settingsList[i].dbNumber );
         clientList[i].client -> setName ( settingsList[i].stationName.data() );
 
-        clientList[i].clientWindow->createWindows(mainWindow->engine, mainWindow->window);
+        clientList[i].clientWindow->createWindows( mainWindow->engine, mainWindow->window );
         clientList[i].clientWindow->onStationNameUpdate( settingsList[i].stationName.data() );
         clientList[i].clientWindow->onIpUpdate( settingsList[i].ipAddress.data() );
         clientList[i].clientWindow->onDbUpdate( settingsList[i].dbNumber );

@@ -44,7 +44,7 @@ void ClientWindow::createWindows(QQmlApplicationEngine& engine, QQuickWindow* wi
 #ifdef QT_DEBUG
     component = new QQmlComponent(&engine, QUrl("qrc:/ClientUiForm.qml")); // load new QML window to engine
 #else
-    component = new QQmlComponent(&engine, QUrl::fromLocalFile("qml/ClientUiForm.qml")); // load new QML window to engine
+    component = new QQmlComponent(&engine, QUrl::fromLocalFile(QStringLiteral("qml/ClientUiForm.qml"))); // load new QML window to engine
 #endif
     if ( component->isError() ){
         qDebug() << component->errors();

@@ -1,12 +1,12 @@
 TEMPLATE = app
 
-QT += qml quick widgets sql core gui
+QT += qml quick widgets sql core
 
 TARGET      = RepoDest
 TEMPLATE    = app
 
-CONFIG      += c++11\
-               static
+CONFIG      += c++11
+
 QTPLUGIN    += qsqloci
 
 SOURCES     +=  main.cpp\
@@ -40,6 +40,7 @@ RESOURCES += qml.qrc \
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
+
 
 # Default rules for deployment.
 include(deployment.pri)

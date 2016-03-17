@@ -5,8 +5,8 @@ import QtQuick.Layouts 1.1
 
 ApplicationWindow {
     visible: true
-    maximumHeight: 400
-    maximumWidth: 500
+    maximumHeight: 1000
+    maximumWidth: 1000
     minimumHeight: 400
     minimumWidth: 500
     title: qsTr("Raportowanie przestojów")
@@ -32,8 +32,6 @@ ApplicationWindow {
         width: 250
         height: 250
         objectName: "gridLayoutFirst"
-
-
     }
 
     Flow {

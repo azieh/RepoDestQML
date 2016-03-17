@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Adrian Wasielewski");
     QCoreApplication::setApplicationName("Raportowanie przestojów");
 
-
     QSharedMemory shared("62d60669-bb94-4a94-88bb-b964890a7e04");   //Creating shared memory to every single application
 
     if( !shared.create( 512, QSharedMemory::ReadWrite) )
