@@ -5,8 +5,8 @@ import QtQuick.Layouts 1.1
 
 ApplicationWindow {
     visible: true
-    maximumHeight: 1000
-    maximumWidth: 1000
+    maximumHeight: 400
+    maximumWidth: 500
     minimumHeight: 400
     minimumWidth: 500
     title: qsTr("Raportowanie przestojów")
