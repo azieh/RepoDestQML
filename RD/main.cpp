@@ -8,6 +8,8 @@
 int main(int argc, char *argv[])
 {
 
+    // Options on Windows; set before instantiating QApplication
+    QCoreApplication::setAttribute( Qt::AA_UseSoftwareOpenGL ); // use Software OpenGL
     QApplication app(argc, argv);
 
     QCoreApplication::setOrganizationName("Adrian Wasielewski");
